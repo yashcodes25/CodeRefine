@@ -1,12 +1,24 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas import CodeRequest, CodeResponse
+from app.schemas import AnalyzeRequest
 from app.ai_engine import analyze_code
 
 router = APIRouter()
 
-@router.post("/analyze", response_model=CodeResponse)
-def analyze(request: CodeRequest):
+
+@router.post("/analyze")
+def analyze(request: AnalyzeRequest):
+    """
+    Analyze source code using Groq LLM.
+    """
     try:
-        return analyze_code(request.code, request.language.lower())
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal analysis error")
+        result = analyze_code(
+            code=request.code,
+            language=request.language
+        )
+        return result
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI analysis failed: {str(e)}"
+        )

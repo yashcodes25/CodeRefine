@@ -1,107 +1,204 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
+  background: black;
   color: white;
 }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
-}
-
-h1 {
-  color: #38bdf8;
-}
-
-select {
-  background: #020617;
-  color: #e5e7eb;
-  border: 1px solid #334155;
-  padding: 0.5rem;
-  border-radius: 8px;
-  margin-right: 1rem;
-}
-
-textarea {
-  background: #020617;
-  color: #e5e7eb;
-  border: 1px solid #334155;
-  padding: 1rem;
-  border-radius: 10px;
-  font-family: monospace;
-}
-
-
-button {
-  background: #0ea5e9;
-  color: #020617;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button:disabled {
-  background: #475569;
-  cursor: not-allowed;
-}
-
-/* ===== RESULT SECTION ===== */
-
-.result {
-  margin-top: 2rem;
-  background: #020617;
-  padding: 1.5rem;
-  border-radius: 10px;
-}
-
-pre {
+/* HEADER */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   background: black;
-  padding: 1rem;
-  overflow-x: auto;
-  border-radius: 6px;
+  border-bottom: 1px solid #222;
+  z-index: 1000;
 }
 
-/* ===== SEVERITY COLORS ===== */
-
-.severity {
-  margin-bottom: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 6px;
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.severity.low {
-  background: #064e3b;
-  color: #6ee7b7;
+.brand {
+  font-size: 20px;
+  font-weight: 600;
 }
 
-.severity.medium {
-  background: #78350f;
-  color: #fde68a;
+.nav {
+  display: flex;
+  gap: 12px;
 }
 
-.severity.high {
-  background: #7f1d1d;
-  color: #fecaca;
+.ghost {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.badge {
-  display: inline-block;
-  margin-bottom: 1rem;
-  padding: 0.4rem 0.8rem;
-  background: #1e293b;
-  color: #38bdf8;
-  border-radius: 999px;
-  font-size: 0.85rem;
+/* HERO */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-ul {
-  padding-left: 1rem;
+.ball {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  background: white;
+  border-radius: 50%;
+  z-index: 1;
+  transition: transform 0.15s ease-out;
 }
 
-h2, h3 {
-  margin-top: 1.5rem;
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.title {
+  font-size: 64px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #ccc;
+}
+
+/* CENTERED SECTIONS */
+.impact,
+.platform,
+.contact {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 24px;
+  text-align: center;
+}
+
+.impact p {
+  max-width: 700px;
+  margin: 16px auto;
+  line-height: 1.7;
+  color: #ddd;
+}
+
+/* CODE GRID */
+.code-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+}
+
+.code-box {
+  border: 1px solid white;
+  padding: 12px;
+  background: black;
+}
+
+.code-box textarea {
+  width: 100%;
+  min-height: 220px;
+  background: black;
+  color: white;
+  border: none;
+  outline: none;
+}
+
+.output {
+  min-height: 220px;
+  background: black;
+  color: #7dff7d;
+  padding: 12px;
+  border: 1px solid #333;
+  overflow: auto;
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+select,
+button {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  padding: 12px 16px;
+}
+
+button:hover {
+  background: white;
+  color: black;
+}
+
+.high { color: #ff4d4d; }
+.medium { color: #ffd966; }
+.low { color: #7dff7d; }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: black;
+  border: 1px solid white;
+  padding: 30px;
+  width: 320px;
+  text-align: center;
+}
+
+.modal-box input {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  background: black;
+  border: 1px solid white;
+  color: white;
+}
+
+.primary {
+  background: white;
+  color: black;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .code-grid {
+    grid-template-columns: 1fr;
+  }
 }

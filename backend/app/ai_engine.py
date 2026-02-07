@@ -1,67 +1,78 @@
+import os
 import json
 import re
-from app.gemini_engine import gemini_review
+from groq import Groq
+from dotenv import load_dotenv
 
+load_dotenv()
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def extract_json(text: str):
     """
-    Aggressively extract JSON from Gemini response.
-    Works even if Gemini adds extra text.
+    Extract the first JSON object found in text.
     """
-    match = re.search(r"\{[\s\S]*\}", text)
+    match = re.search(r"\{.*\}", text, re.DOTALL)
     if not match:
-        raise ValueError("No JSON found")
+        raise ValueError("No JSON object found")
     return json.loads(match.group())
 
-
 def analyze_code(code: str, language: str):
-    # ---------------- STATIC BACKUP (NOT FINAL OUTPUT) ----------------
-    static_issues = []
+    prompt = f"""
+You are a STRICT code review engine.
 
-    if "eval(" in code:
-        static_issues.append({
-            "category": "Security",
-            "message": "Usage of eval() can cause security vulnerabilities",
-            "severity": "high"
-        })
+RULES (MANDATORY):
+- Output MUST be valid JSON
+- Output MUST start with {{ and end with }}
+- NO markdown
+- NO explanations outside JSON
+- NO code blocks
+- NO backticks
 
-    # ---------------- GEMINI AI (MANDATORY) ----------------
+Return EXACTLY this JSON schema:
+
+{{
+  "score": number,
+  "issues": [
+    {{
+      "category": "string",
+      "message": "string",
+      "severity": "low | medium | high"
+    }}
+  ],
+  "optimized_code": "string",
+  "explanation": "string"
+}}
+
+Analyze this {language} code:
+
+{code}
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "system", "content": "You output ONLY raw JSON. No text."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=700
+    )
+
+    raw_output = response.choices[0].message.content
+
     try:
-        gemini_text = gemini_review(code, language)
-        gemini_json = extract_json(gemini_text)
-
-        # Ensure Gemini always returns issues
-        issues = gemini_json.get("issues", [])
-        if not issues:
-            issues = [{
-                "category": "AI Review",
-                "message": "No major issues found, but code can be improved for readability and scalability.",
-                "severity": "low"
-            }]
-
-        # Enforce severity correctness
-        for issue in issues:
-            if issue.get("severity") not in ["low", "medium", "high"]:
-                issue["severity"] = "medium"
-
-        return {
-            "score": 90,
-            "issues": issues,
-            "optimized_code": gemini_json.get("optimized_code", code),
-            "explanation": "AI-powered code review generated using Google Gemini."
-        }
-
+        return extract_json(raw_output)
     except Exception:
-        # 🚨 EVEN IF GEMINI JSON FAILS — RETURN AI RESPONSE
         return {
-            "score": 85,
+            "score": 0,
             "issues": [
                 {
-                    "category": "AI Review",
-                    "message": "Gemini AI analyzed the code and found no critical issues. Minor improvements are recommended.",
-                    "severity": "low"
+                    "category": "AI Formatting Error",
+                    "message": "Model did not return strict JSON",
+                    "severity": "high"
                 }
-            ] + static_issues,
+            ],
             "optimized_code": code,
-            "explanation": "AI-powered analysis executed using Gemini (fallback interpretation)."
+            "explanation": raw_output
         }
